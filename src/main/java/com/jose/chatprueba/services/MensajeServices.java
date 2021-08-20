@@ -1,12 +1,16 @@
 package com.jose.chatprueba.services;
 
+import com.jose.chatprueba.dto.MensajeDTO;
 import com.jose.chatprueba.models.Chat;
 import com.jose.chatprueba.models.Mensaje;
+import com.jose.chatprueba.models.Usuario;
 import com.jose.chatprueba.repositories.MensajeRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +39,10 @@ public class MensajeServices implements IServices<Mensaje>, IMensajeServices{
         Arrays.stream(mensajes).forEach(mensajeRepository::save);
     }
     @Override
+    public Mensaje registra(Mensaje mensaje) {
+    	return mensajeRepository.save(mensaje);
+    }
+    @Override
     public void elimina(Mensaje mensaje) {
         mensajeRepository.delete(mensaje);
     }
@@ -52,11 +60,32 @@ public class MensajeServices implements IServices<Mensaje>, IMensajeServices{
         return mensajes;
     }
     @Override
-    public boolean enviarMensaje(Integer id_chat, Integer id_usuario, String texto) {
-        return false;
+    public void enviarMensaje(MensajeDTO mensajeDTO) {
+    	String texto = mensajeDTO.getTexto();
+    	Usuario user = usuarioServices.buscaPorNombre(mensajeDTO.getNombreUsuario()).get();
+    	Chat chat = chatServices.buscaPorId(mensajeDTO.getIdChat()).get();
+    	Mensaje mensaje = new Mensaje(texto, user, chat);
+    	registra(mensaje);
     }
     @Override
     public Optional<List<Mensaje>> mensajesNoVistos(Integer id_usuario) {
         return mensajeRepository.mensajesNoVistos(id_usuario);
     }
+	@Override
+	public boolean compruebaPorId(Integer id) {
+		return mensajeRepository.existsById(id);
+	}
+	public List<MensajeDTO> mensajesToDTO(List<Mensaje> mensajes){
+		List<MensajeDTO> mensajesDTO = new ArrayList<MensajeDTO>();
+		mensajes.forEach((m) -> {
+			MensajeDTO mensajeDTO = MensajeDTO.builder()
+										.texto(m.getTexto())
+										.nombreUsuario(m.getUsuario().getNombre())
+										.idChat(m.getChat().getId())
+										.build();
+			mensajesDTO.add(mensajeDTO);
+		});
+		
+		return mensajesDTO;
+	}
 }

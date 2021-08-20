@@ -1,5 +1,6 @@
 package com.jose.chatprueba.services;
 
+import com.jose.chatprueba.dto.ChatDTO;
 import com.jose.chatprueba.models.Chat;
 import com.jose.chatprueba.repositories.ChatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ public class ChatServices implements IServices<Chat> , IChatServices{
     ChatRepository chatRepository;
     @Autowired
     UsuarioServices usuarioServices;
+    @Autowired
+    MensajeServices mensajeServices;
 
     //Funciones comunes a los servicios
     @Override
@@ -29,6 +32,10 @@ public class ChatServices implements IServices<Chat> , IChatServices{
     @Override
     public void registra(Chat ... chat) {
         Arrays.stream(chat).forEach(chatRepository::save);
+    }
+    @Override
+    public Chat registra(Chat chat) {
+    	return chatRepository.save(chat);
     }
     @Override
     public void elimina(Chat chat) {
@@ -78,5 +85,20 @@ public class ChatServices implements IServices<Chat> , IChatServices{
         System.out.println("");
         return map;
     }
+    public List<Chat> buscaChatsPorEmail(String email){
+    	return chatRepository.buscaChatsPorEmail(email).get();
+    }
+	@Override
+	public boolean compruebaPorId(Integer id) {
+		return chatRepository.existsById(id);
+	}
+	public ChatDTO convertToDTO(Integer idChat) {
+		Chat chat = buscaPorId(idChat).get();
+		ChatDTO chatDTO = ChatDTO.builder()
+				.id(chat.getId())
+				.mensajes(mensajeServices.mensajesToDTO(chat.getMensajes()))
+				.build();
+		return chatDTO;
+	}
 
 }

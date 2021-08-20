@@ -33,6 +33,13 @@ public class Mensaje {
         this.texto = texto;
         visto = false;
     }
+    public Mensaje(String texto, Usuario usuario, Chat chat) {
+    	this.fecha = new Date();
+        this.texto = texto;
+        visto = false;
+        this.usuario = usuario;
+        this.chat = chat;
+    }
 
     @Override
     public String toString() {
