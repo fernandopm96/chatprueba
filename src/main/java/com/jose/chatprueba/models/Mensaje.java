@@ -3,15 +3,11 @@ package com.jose.chatprueba.models;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -30,9 +26,6 @@ public class Mensaje {
     @ManyToOne
     @JoinColumn(name="id_usuario")
     protected Usuario usuario;
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "mensaje")
-    private List<BandejaEntrada> destinatarios;
 
     public Mensaje() {
     }

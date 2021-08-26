@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.jose.chatprueba.models.MensajeUsuario;
-import com.jose.chatprueba.models.Usuario;
+
 @Repository
 public interface MensajeUsuarioRepository extends JpaRepository<MensajeUsuario, Integer>{
 	@Query("SELECT mu FROM MensajeUsuario mu WHERE mu.id IN "

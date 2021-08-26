@@ -1,24 +1,11 @@
 package com.jose.chatprueba.controllerf;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-
-import com.jose.chatprueba.dto.CreateUsuarioDTO;
-import com.jose.chatprueba.dto.GetUsuarioDTO;
-import com.jose.chatprueba.dto.converter.UsuarioDTOConverter;
-import com.jose.chatprueba.excepciones.UsuarioNotFoundException;
 import com.jose.chatprueba.models.*;
 import com.jose.chatprueba.services.*;
-
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -26,10 +13,14 @@ import lombok.AllArgsConstructor;
 public class UsuarioController {
 
 	private UsuarioServices usuarioServices;
-	private ChatServices chatService;
-	private MensajeServices mensajeService;
-	private IFicheroService iFicheroService;
-	private UsuarioDTOConverter dtoConverter;
+
+	@GetMapping("/usuarios/")
+	public ResponseEntity<List<Usuario>> listaUsuarios() {
+		return ResponseEntity.status(HttpStatus.OK).body(usuarioServices.buscaTodos());
+	}
+}
+
+// FUNCIONES PARA EL CRUD Y SUBIDA DE FICHEROS NO UTILIZADAS AÚN
 
 /*	@GetMapping("/usuario")
 	public ResponseEntity<List<GetUsuarioDTO>> usuarios(){
@@ -69,8 +60,3 @@ public class UsuarioController {
 		usuarioService.elimina(u);
 		return ResponseEntity.noContent().build();
 	}	*/
-	@GetMapping("/usuarios/")
-	public ResponseEntity<List<Usuario>> listaUsuarios() {
-		return ResponseEntity.status(HttpStatus.OK).body(usuarioServices.buscaTodos());
-	}
-}

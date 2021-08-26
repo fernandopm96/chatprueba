@@ -8,25 +8,16 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jose.chatprueba.dto.MensajeDTO;
-import com.jose.chatprueba.dto.converter.UsuarioDTOConverter;
 import com.jose.chatprueba.models.Chat;
 import com.jose.chatprueba.models.MensajeUsuario;
 import com.jose.chatprueba.models.Usuario;
-import com.jose.chatprueba.security.jwt.JwtProvider;
-import com.jose.chatprueba.services.ChatServices;
-import com.jose.chatprueba.services.MensajeGrupoServices;
-import com.jose.chatprueba.services.MensajeUsuarioServices;
-import com.jose.chatprueba.services.UsuarioServices;
-
+import com.jose.chatprueba.services.*;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -40,13 +31,15 @@ public class MensajesController {
 	@Autowired @Lazy
 	private ChatServices chatServices;
 	@Autowired @Lazy
-	private MensajeGrupoServices mensajeGrupoServices;
+	private MensajeServices mensajeServices;
+	
+	// Función que devuelve los mensajes de un grupo
 	
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/mensajesgrupo/{idGrupo}")
 	public ResponseEntity<?> mensajesGrupo(@AuthenticationPrincipal Usuario user, @PathVariable Integer idGrupo){
 		Chat chat = chatServices.buscaPorId(idGrupo).get();
-		List<MensajeDTO> mensajesDTO = mensajeGrupoServices.convertToDTO(chat.getMensajes());
+		List<MensajeDTO> mensajesDTO = mensajeServices.mensajesGrupoToDTO(chat.getMensajes());
 		if(!mensajesDTO.isEmpty()) {
 			System.out.println(mensajesDTO);
 			return ResponseEntity.status(HttpStatus.OK).body(mensajesDTO);
@@ -55,14 +48,15 @@ public class MensajesController {
 		}
 	}
 	
+	// Función que devuelve los mensajes de una conversación privada
+	
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/mensaje/{idDestinatario}")
 	public ResponseEntity<?> mensajesUsuario(@AuthenticationPrincipal Usuario user, @PathVariable Integer idDestinatario){
 		Integer id_usuario = user.getId();
 		Optional<List<MensajeUsuario>> mensajesUsuario = mensajeUsuarioServices.muestraMensajesUsuario(id_usuario, idDestinatario); 
 		if(!mensajesUsuario.isEmpty()) {
-			mensajeUsuarioServices.usuarioLeeMensajes(id_usuario, mensajesUsuario.get());
-			List<MensajeDTO> mensajes = mensajeUsuarioServices.convertToDTO(mensajesUsuario.get());
+			List<MensajeDTO> mensajes = mensajeServices.mensajesUsuarioToDTO(mensajesUsuario.get());
 			return ResponseEntity.status(HttpStatus.OK).body(mensajes);
 		} else {
 			return ResponseEntity.status(HttpStatus.OK).body("No hay mensajes");

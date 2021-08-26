@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
-import org.hibernate.annotations.Where;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.*;
@@ -16,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jose.chatprueba.security.UserRole;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.*;
 
@@ -49,9 +46,6 @@ public class Usuario implements UserDetails {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, /*cascade = CascadeType.ALL ,*/ mappedBy = "usuario")
     private List<Mensaje> mensajes;
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "usuario")
-    private List<BandejaEntrada> mensajesRecibidos;
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "destinatario")
     private List<MensajeUsuario> mensajesPrivadosRecibidos;

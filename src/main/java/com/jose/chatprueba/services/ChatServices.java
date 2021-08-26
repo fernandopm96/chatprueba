@@ -15,12 +15,11 @@ import java.util.*;
 @Transactional
 public class ChatServices implements IServices<Chat> , IChatServices{
 
-    @Autowired
+    @Lazy @Autowired
     ChatRepository chatRepository;
-    @Lazy
-    @Autowired
+    @Lazy @Autowired
     UsuarioServices usuarioServices;
-    @Autowired
+    @Lazy @Autowired
     MensajeServices mensajeServices;
     @Lazy @Autowired
     MensajeGrupoServices mensajeGrupoServices;
@@ -35,10 +34,6 @@ public class ChatServices implements IServices<Chat> , IChatServices{
         return chatRepository.findById(id);
     }
     @Override
-    public void registra(Chat ... chat) {
-        Arrays.stream(chat).forEach(chatRepository::save);
-    }
-    @Override
     public Chat registra(Chat chat) {
     	return chatRepository.save(chat);
     }
@@ -50,39 +45,35 @@ public class ChatServices implements IServices<Chat> , IChatServices{
     public void elimina(Integer id) {
         chatRepository.deleteById(id);
     }
-
-    //Funciones de IChatServices
     @Override
-    public Optional<List<Chat>> buscaPorUsuario(Integer id_usuario) {
-        return chatRepository.buscaPorUsuario(id_usuario);
-    }
-    public void registraUsuariosEnChat(Integer id_chat, Integer id_usuario) {
-    	chatRepository.getById(id_chat).agregaUsuario(usuarioServices.buscaPorId(id_usuario).get());
-    }
-    public List<Chat> buscaChatsPorEmail(String email){
-    	return chatRepository.buscaChatsPorEmail(email).get();
-    }
-	@Override
 	public boolean compruebaPorId(Integer id) {
 		return chatRepository.existsById(id);
 	}
-	public ChatDTO convertToDTO(Integer idChat) {
+
+    // Servicios relacionadas con Usuario
+    public void registraUsuariosEnChat(Integer id_chat, Integer id_usuario) {
+    	chatRepository.getById(id_chat).agregaUsuario(usuarioServices.buscaPorId(id_usuario).get());
+    }
+    public List<Chat> chatsUsuario(Integer idUsuario){
+		Usuario usuario = usuarioServices.buscaPorId(idUsuario).get();
+		return usuario.getChats();
+	}
+    
+	// Servicio que convierte un chat a chatDTO
+    public ChatDTO convertToDTO(Integer idChat) {
 		Chat chat = buscaPorId(idChat).get();
 		
 		ChatDTO chatDTO = ChatDTO.builder()
 				.id(chat.getId())
-				.mensajes(mensajeGrupoServices.convertToDTO(chat.getMensajes()))
+				.mensajes(mensajeServices.mensajesGrupoToDTO(chat.getMensajes()))
 				.build();
 		return chatDTO;
 	}
-	public List<Chat> chatsUsuario(Integer idUsuario){
-		Usuario usuario = usuarioServices.buscaPorId(idUsuario).get();
-		return usuario.getChats();
-	}
-	@Override
-	public boolean creaChat(Integer... id_usuario) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
 }
+
+/*@Override
+public boolean creaChat(Integer... id_usuario) {
+// TODO Auto-generated method stub
+return false;
+}
+*/
