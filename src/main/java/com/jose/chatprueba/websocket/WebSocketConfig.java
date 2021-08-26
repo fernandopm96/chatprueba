@@ -23,7 +23,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
                 .addEndpoint("/chat")
-       //         .withSockJs()
                 .setAllowedOriginPatterns(
                         "http://localhost:[*]",
                         "chrome-extension://**",
@@ -42,7 +41,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void onSocketConnected(SessionConnectedEvent event) {
         StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
         System.out.println("[Connected] " + sha.getUser().getName());
-        //System.out.println(event.getUser());
     }
 
     @EventListener

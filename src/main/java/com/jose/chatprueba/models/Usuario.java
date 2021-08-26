@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,17 +43,18 @@ public class Usuario implements UserDetails {
     @CollectionTable(name="roles_usuario", joinColumns=@JoinColumn(name="id_usuario"))
     @Column(name="rol")
     private Set<UserRole> roles;
- /*   @CreatedDate
-    private LocalDateTime fechaCreacion;
-    @Builder.Default
-    private LocalDateTime ultimaEdicionPass = LocalDateTime.now();*/
     @JsonIgnore
-    @ManyToMany(/*cascade = { CascadeType.ALL },*/fetch = FetchType.LAZY, mappedBy = "usuarios")
-    private Set<Chat> chats;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "usuarios")
+    private List<Chat> chats;
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, /*cascade = CascadeType.ALL ,*/ mappedBy = "usuario")
     private List<Mensaje> mensajes;
-   
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "usuario")
+    private List<BandejaEntrada> mensajesRecibidos;
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "destinatario")
+    private List<MensajeUsuario> mensajesPrivadosRecibidos;
 
     public Usuario(String nombre, String pass, String mail) {
         this.nombre = nombre;
@@ -74,6 +76,12 @@ public class Usuario implements UserDetails {
     public void agregaMensaje(Mensaje m){
         mensajes.add(m);
     }
+/*    public void recibeMensaje(Mensaje m) {
+    	if(mensajesRecibidos == null) {
+    		mensajesRecibidos = new ArrayList<>();
+    	}
+    	mensajesRecibidos.add(m);
+    }*/
 
     @Override
     public String toString() {

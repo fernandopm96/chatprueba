@@ -25,13 +25,13 @@ import lombok.AllArgsConstructor;
 @RestController
 public class UsuarioController {
 
-	private UsuarioServices usuarioService;
+	private UsuarioServices usuarioServices;
 	private ChatServices chatService;
 	private MensajeServices mensajeService;
 	private IFicheroService iFicheroService;
 	private UsuarioDTOConverter dtoConverter;
 
-	@GetMapping("/usuario")
+/*	@GetMapping("/usuario")
 	public ResponseEntity<List<GetUsuarioDTO>> usuarios(){
 		return ResponseEntity.ok(usuarioService.buscaTodosDTO());	
 	}
@@ -68,5 +68,9 @@ public class UsuarioController {
 		Usuario u = usuarioService.buscaPorId(id).orElseThrow(() -> new UsuarioNotFoundException(id));
 		usuarioService.elimina(u);
 		return ResponseEntity.noContent().build();
-	}	
+	}	*/
+	@GetMapping("/usuarios/")
+	public ResponseEntity<List<Usuario>> listaUsuarios() {
+		return ResponseEntity.status(HttpStatus.OK).body(usuarioServices.buscaTodos());
+	}
 }

@@ -5,6 +5,7 @@ import com.jose.chatprueba.dto.GetUsuarioDTO;
 import com.jose.chatprueba.dto.converter.UsuarioDTOConverter;
 import com.jose.chatprueba.excepciones.UsuarioConPasswordDistintasException;
 import com.jose.chatprueba.excepciones.UsuarioNotFoundException;
+import com.jose.chatprueba.models.BandejaEntrada;
 import com.jose.chatprueba.models.Chat;
 import com.jose.chatprueba.models.Mensaje;
 import com.jose.chatprueba.models.Usuario;
@@ -15,15 +16,19 @@ import com.jose.chatprueba.security.UserRole;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,8 +36,14 @@ import java.util.stream.Stream;
 @Transactional
 @AllArgsConstructor
 public class UsuarioServices implements IServices<Usuario>, IUsuarioServices{
-    @Autowired
+	@Lazy @Autowired
+	ChatServices chatServices;
+	@Lazy @Autowired
+	MensajeServices mensajeServices;
+	@Lazy @Autowired
     UsuarioRepository usuarioRepository;
+	@Lazy @Autowired
+	BandejaEntradaServices bandejaEntradaServices;
     @Autowired
     private UsuarioDTOConverter usuarioConverter;
     @Autowired
@@ -50,10 +61,6 @@ public class UsuarioServices implements IServices<Usuario>, IUsuarioServices{
     public Optional<Usuario> buscaPorNombre(String nombre) {
     	return usuarioRepository.buscaPorNombre(nombre);
     }
-   /* @Override
-    public void registra(Usuario ... usuarios) {
-        Arrays.stream(usuarios).forEach(usuarioRepository::save);
-    }*/
     @Override
 	public Usuario registra(Usuario usuario) {
     	usuario.setPass(passwordEncoder.encode(usuario.getPass()));
@@ -137,4 +144,23 @@ public class UsuarioServices implements IServices<Usuario>, IUsuarioServices{
 		// TODO Auto-generated method stub
 		
 	}
+	public Usuario usuarioPerteneceChat(Integer idUsuario, Integer idChat) {
+		return usuarioRepository.usuarioPerteneceChat(idUsuario, idChat).orElse(null);
+	}
+	public List<Integer> usuariosEnChat(Integer idChat) {
+		return usuarioRepository.usuariosEnChat(idChat);
+	}
+	public Optional<List<Usuario>> conversaciones(Integer id_usuario){
+		return usuarioRepository.conversaciones(id_usuario);
+	}
+	/* Al acceder a un chat, se cargan los mensajes de ese chat y también los mensajes recibidos de ese usuario en la tabla 'mensajes_recibidos'. 
+	Los que coincidan son los mensajes recibidos en ese chat no leídos por el usuario, que pasarán a visto = true*/
+/*	public void usuarioAccedeChat(Integer idUsuario, Integer idChat) {
+		Optional<List<BandejaEntrada>> mensajesNoVistos = bandejaEntradaServices.mensajesNoVistos(idUsuario, idChat);
+		if(mensajesNoVistos.isPresent()) {
+			for(BandejaEntrada m:mensajesNoVistos.get()) {
+				m.setVisto(true);
+			}
+		}
+	}*/
 }

@@ -28,6 +28,7 @@ import com.jose.chatprueba.models.Usuario;
 import com.jose.chatprueba.security.jwt.JwtProvider;
 import com.jose.chatprueba.security.jwt.models.*;
 import com.jose.chatprueba.services.ChatServices;
+import com.jose.chatprueba.services.UsuarioServices;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +41,7 @@ public class AuthenticationController {
 	private final UsuarioDTOConverter usuarioDTOConverter;
 //	@Autowired private SessionRegistry sessionRegistry;
 	@Autowired ChatServices chatService;
+	@Autowired UsuarioServices usuarioServices;
 	
 /*	@GetMapping("auth/logout")
 	public void logout(@AuthenticationPrincipal Usuario usuario) {
@@ -71,9 +73,9 @@ public class AuthenticationController {
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping("/user/chats")
-	public Optional<List<Chat>> chatsUsuario(@AuthenticationPrincipal Usuario user){
-		return chatService.buscaPorUsuario(user.getId());
+	@GetMapping("/user/conversaciones")
+	public Optional<List<Usuario>> conversacionesUsuario(@AuthenticationPrincipal Usuario user){
+		return usuarioServices.conversaciones(user.getId());
 	}
 	
 /*	@GetMapping("/usuariosLogeados")

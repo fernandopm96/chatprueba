@@ -16,6 +16,14 @@ public class Chat {
     private int id;
     @Column(name="fecha")
     private Date fecha;
+    @Column(name="nombre")
+    private String nombre;
+    @Column(name="descripcion")
+    private String descripcion;
+    @Column(name="foto")
+    private String foto;
+    @Column(name="ultima_edicion")
+    private Date ultimaEdicion;
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     @JoinTable(
@@ -25,9 +33,9 @@ public class Chat {
     )
     private Set<Usuario> usuarios;
     @JsonIgnore
-    @OneToMany(mappedBy = "chat")
-    private List<Mensaje> mensajes;
-
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chat")
+    private List<MensajeGrupo> mensajes;
+    
     public Chat() {
         fecha = new Date();
     }
